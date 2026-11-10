@@ -7,6 +7,25 @@ from bandit.core import issue
 from bandit.core import test_properties as test
 
 
+_COMMUNITY_DATA_CALLS = {
+    "pysnmp.hlapi.CommunityData",
+    "pysnmp.hlapi.asyncio.CommunityData",
+    "pysnmp.hlapi.v1arch.CommunityData",
+    "pysnmp.hlapi.v1arch.asyncio.CommunityData",
+    "pysnmp.hlapi.v1arch.asyncio.auth.CommunityData",
+    "pysnmp.hlapi.v3arch.CommunityData",
+    "pysnmp.hlapi.v3arch.asyncio.CommunityData",
+    "pysnmp.hlapi.v3arch.asyncio.auth.CommunityData",
+}
+_USM_USER_DATA_CALLS = {
+    "pysnmp.hlapi.UsmUserData",
+    "pysnmp.hlapi.asyncio.UsmUserData",
+    "pysnmp.hlapi.v3arch.UsmUserData",
+    "pysnmp.hlapi.v3arch.asyncio.UsmUserData",
+    "pysnmp.hlapi.v3arch.asyncio.auth.UsmUserData",
+}
+
+
 @test.checks("Call")
 @test.test_id("B508")
 def snmp_insecure_version_check(context):
@@ -43,7 +62,7 @@ def snmp_insecure_version_check(context):
 
     """  # noqa: E501
 
-    if context.call_function_name_qual == "pysnmp.hlapi.CommunityData":
+    if context.call_function_name_qual in _COMMUNITY_DATA_CALLS:
         # We called community data. Lets check our args
         if context.check_call_arg_value(
             "mpModel", 0
@@ -98,7 +117,7 @@ def snmp_crypto_check(context):
 
     """  # noqa: E501
 
-    if context.call_function_name_qual == "pysnmp.hlapi.UsmUserData":
+    if context.call_function_name_qual in _USM_USER_DATA_CALLS:
         if context.call_args_count < 3:
             return bandit.Issue(
                 severity=bandit.MEDIUM,
